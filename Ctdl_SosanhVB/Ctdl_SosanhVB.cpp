@@ -3,9 +3,10 @@
 #include<fstream>
 #include<vector>
 #include<time.h>
+#include<iomanip>
 using namespace std;
 
-struct Node 
+struct Node
 {
     string data;
     Node* left;
@@ -83,7 +84,26 @@ Node* minValueNode(Node* node)
     return current;
 }
 
+bool StopWord(string s)
+{
+    string f, str;
+    vector<string> vct_StopWord;
+    ifstream file;
+    file.open("stopword.txt", ios::in);
+    while (!file.eof())
+    {
+        file >> f;
+        vct_StopWord.push_back(f);
+    }
+    while (vct_StopWord.size() != 0)
+    {
+        if (s == vct_StopWord[vct_StopWord.size() - 1])
+            return true;
 
+        vct_StopWord.pop_back();
+    }
+    return false;
+}
 string NoCapsCharacter(string str)
 {
     for (int i = 0; i < str.length(); i++)
@@ -135,7 +155,7 @@ int StringSimilarity(string s1, string s2)
                 Count++;
                 break;
             }
-    if (Count >= vct2.size() * 50 / 100 && vct2.size() >= 20 || Count >= vct2.size() * 60 / 100)
+    if (Count >= vct2.size() * 60 / 100 && vct2.size() >= 25 || Count >= vct2.size() * 70 / 100)
         return 1;
     else
         return 0;
@@ -338,16 +358,16 @@ double Result(Node* Parent1, Node* Parent2, vector<string> vct)
         u += (vct_f1[i] * vct_f1[i]);
         v += (vct_f2[i] * vct_f2[i]);
     }
- /*   cout << "\n";
-    for (int i = 0; i < vct_f1.size(); i++)
-    {
-        cout << vct_f1[i] << " ";
-    }
-    cout << "\n";
-    for (int i = 0; i < vct_f1.size(); i++)
-    {
-        cout << vct_f2[i] << " ";
-    }*/
+    /*   cout << "\n";
+       for (int i = 0; i < vct_f1.size(); i++)
+       {
+           cout << vct_f1[i] << " ";
+       }
+       cout << "\n";
+       for (int i = 0; i < vct_f1.size(); i++)
+       {
+           cout << vct_f2[i] << " ";
+       }*/
     cout << "\n";
     double T = (double)sum / (sqrt(u) * sqrt(v));
     return T;
@@ -362,18 +382,21 @@ void DocFile(Node*& root, vector<string>& vct_datatree, string name)
     while (!(file.eof()))
     {
         file >> f;
-        str += NoCapsCharacter(f);
-        if (f[f.length() - 1] != '.')
-            str += " ";
-        if (f[f.length() - 1] == '.')
+        if (!StopWord(NoCapsCharacter(f)))
         {
-            str.pop_back();
-            if (!CheckIfExist(str, vct_datatree, root))
+            str += NoCapsCharacter(f);
+            if (f[f.length() - 1] != '.')
+                str += " ";
+            if (f[f.length() - 1] == '.')
             {
-                vct_datatree.push_back(str);
+                str.pop_back();
+                if (!CheckIfExist(str, vct_datatree, root))
+                {
+                    vct_datatree.push_back(str);
+                }
+                root = insertNode(root, str);
+                str = "";
             }
-            root = insertNode(root, str);
-            str = "";
         }
     }
     if (str != "")
@@ -470,7 +493,7 @@ void sosanhTungfile()
             if (j == vct_tree1.size())
                 vct_tree1.push_back(vct_tree2[i]);
         }
-        cout << "|          File " << i + 1 << ": " << Result(rootf1, rootf2, vct_tree1) << "        |";
+        cout << "|          File " << i + 1 << ": " << fixed << setprecision(6) << Result(rootf1, rootf2, vct_tree1) << "        |";
         vct_tree1.clear();
         vct_tree2.clear();
     }
@@ -531,7 +554,7 @@ void sosanhvoiNhieuFile()
         if (j == vct_tree1.size())
             vct_tree1.push_back(vct_tree2[i]);
     }
-    cout << "|          File: " << Result(rootf1, rootf2, vct_tree1) << "        |";
+    cout << "|          File: " << fixed << setprecision(6) << Result(rootf1, rootf2, vct_tree1) << "        |";
     vct_tree1.clear();
     vct_tree2.clear();
     cout << "\n----------------------------------\n";
@@ -546,15 +569,15 @@ int main()
         cout << "\n2.Voi nhieu file";
         cout << "\n3.Thoat chuong trinh";
         cout << "\n\nSu lua chon cua ban: ";
-        while (!(cin >> m)) { 
+        while (!(cin >> m)) {
             cerr << "Vui long nhap nhu huong dan: ";
-            cin.clear(); 
-            cin.ignore(numeric_limits<streamsize>::max(), '\n'); 
+            cin.clear();
+            cin.ignore(numeric_limits<streamsize>::max(), '\n');
         }
         system("cls");
         switch (m)
         {
-        case 1:          
+        case 1:
             sosanhTungfile();
             break;
 
@@ -563,7 +586,7 @@ int main()
             break;
         }
         cout << "\n\n";
-    } while (m == 1 ||m == 2);
+    } while (m == 1 || m == 2);
 
     return 0;
 }
